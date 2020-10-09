@@ -26,32 +26,16 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	// Creates Mesh
 	actorPyramid = new CPyramid();
 	actorCube = new CCube(1.0f);
-	actorMeshTest = new CCube(1.1f);
-	actorPlane = new CPlane(10.0f, 10.0f);
 
 	// Create Game Actors
 	actorCubeTwoObj = new CObject(&program, actorCube->GetVAO(), actorCube->GetIndiceCount(), gameCamera, &actorTex);
-	actorCubeObj = new CObject(&program, actorMeshTest->GetVAO(), actorMeshTest->GetIndiceCount(), gameCamera, &actorCubeTex);
-	waterActor = new CObject(&program, actorPlane->GetVAO(), actorPlane->GetIndiceCount(), gameCamera, &actorWaterTex);
-	quadObj = new CObject(&program, actorPlane->GetVAO(), actorPlane->GetIndiceCount(), gameCamera, &actorCubeTex);
+
 
 	// Create Skybox
 	gameSkybox = new CSkybox(&programSkybox, gameCamera);
 
 	// Labels
 	restartLabel = new CTextLabel("Press 'R' to restart", "Resources/Fonts/arial.ttf", glm::vec2(10.0f, 570.0f), glm::vec3(0.0f, 1.0f, 0.5f), 0.5f);
-
-	// Sets water location/rotaion
-	waterActor->objPosition.y -= 0.5;
-	waterActor->objAngleRotation = 180.0f;
-	waterActor->objRotaion = vec3(0.f, 180.f, 180.f);
-
-	// Sets quad location/rotaion
-	quadObj->objPosition.y -= 0.8;
-	quadObj->objAngleRotation = 180.0f;
-	quadObj->objRotaion = vec3(0.f, 180.f, 180.f);
-	quadObj->objScaleAmount = 2.0f;
-
 }
 
 CPlayScene::~CPlayScene()
@@ -78,40 +62,9 @@ void CPlayScene::Render()
 		glPolygonMode(GL_FRONT, GL_LINE);
 	}
 
-
-	// Stencil set up
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilMask(0xFF);
-	// Draw first actor
 	
 	actorCubeTwoObj->Render();
 
-	// The second pass
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF); 
-	glStencilMask(0x00);
-	// Draw second actor
-
-	actorCubeObj->Render();
-
-	// Disable stencil
-	glStencilMask(0x00); //disable writing to stencil mask
-	glDisable(GL_STENCIL_TEST); // Disable stencil test
-	glStencilMask(0xFF); // Enable writing again for next time
-
-	quadObj->Render();
-
-	// Enable blending
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// Draw actors
-
-	waterActor->Render();
-	
-
-	// Disable blending
-	glDisable(GL_BLEND);
 
 
 	gameSkybox->Render();
@@ -158,9 +111,6 @@ void CPlayScene::Update(GLfloat* deltaTime, ESceneManager* _currentScene)
 	
 	gameSkybox->Update();
 	actorCubeTwoObj->Update();
-	waterActor->Update();
-	quadObj->Update();
-	actorCubeObj->Update();
 
 	// Resets every thing in game scene
 	if (gameInput->getKeyState('r') || gameInput->getKeyState('R'))
