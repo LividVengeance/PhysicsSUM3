@@ -146,17 +146,20 @@
     <ClCompile Include="CActor.cpp" />
     <ClCompile Include="CAudio.cpp" />
     <ClCompile Include="CCamera.cpp" />
+    <ClCompile Include="CCloth.cpp" />
     <ClCompile Include="CCube.cpp" />
     <ClCompile Include="CGameManager.cpp" />
     <ClCompile Include="CInput.cpp" />
     <ClCompile Include="CMainMenuScene.cpp" />
     <ClCompile Include="CObject.cpp" />
+    <ClCompile Include="CParticle.cpp" />
     <ClCompile Include="CPlane.cpp" />
     <ClCompile Include="CPlayScene.cpp" />
     <ClCompile Include="CPyramid.cpp" />
     <ClCompile Include="CSkybox.cpp" />
     <ClCompile Include="CSphere.cpp" />
     <ClCompile Include="CTextLabel.cpp" />
+    <ClCompile Include="CTriangle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CShaderLoader.cpp" />
   </ItemGroup>
@@ -164,11 +167,13 @@
     <ClInclude Include="CActor.h" />
     <ClInclude Include="CAudio.h" />
     <ClInclude Include="CCamera.h" />
+    <ClInclude Include="CCloth.h" />
     <ClInclude Include="CCube.h" />
     <ClInclude Include="CGameManager.h" />
     <ClInclude Include="CInput.h" />
     <ClInclude Include="CMainMenuScene.h" />
     <ClInclude Include="CObject.h" />
+    <ClInclude Include="CParticle.h" />
     <ClInclude Include="CPlane.h" />
     <ClInclude Include="CPlayScene.h" />
     <ClInclude Include="CPyramid.h" />
@@ -176,6 +181,7 @@
     <ClInclude Include="CSphere.h" />
     <ClInclude Include="CTextLabel.h" />
     <ClInclude Include="CShaderLoader.h" />
+    <ClInclude Include="CTriangle.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelMesh.h" />
     <ClInclude Include="Utilities.h" />

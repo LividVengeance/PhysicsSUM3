@@ -32,6 +32,7 @@ private:
 
 	// Programs
 	GLint program;
+	GLint programNoFog;
 	GLint programSkybox;
 
 	// Audio
@@ -51,9 +52,6 @@ private:
 
 	// Objects
 	CObject* actorCubeObj;
-	CObject* actorCubeTwoObj;
-	CObject* waterActor;
-	CObject* quadObj;
 
 	// Textures
 	GLuint actorTex;

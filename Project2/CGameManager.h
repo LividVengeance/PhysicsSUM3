@@ -27,6 +27,10 @@
 #include "CPlane.h"
 #include "CPyramid.h"
 
+// Physics
+#include "CCloth.h"
+#include "CParticle.h"
+
 // Program Scenes
 #include "CMainMenuScene.h"
 #include "CPlayScene.h"

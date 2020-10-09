@@ -10,6 +10,9 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	program = CShaderLoader::CreateProgram("Resources/Shaders/Fog.vs",
 		"Resources/Shaders/Fog.fs");
 
+	programNoFog = CShaderLoader::CreateProgram("Resources/Shaders/Basic.vs",
+		"Resources/Shaders/Basic.fs");
+
 	programSkybox = CShaderLoader::CreateProgram("Resources/Shaders/skybox.vs",
 		"Resources/Shaders/skybox.fs");
 
@@ -28,7 +31,7 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	actorCube = new CCube(1.0f);
 
 	// Create Game Actors
-	actorCubeTwoObj = new CObject(&program, actorCube->GetVAO(), actorCube->GetIndiceCount(), gameCamera, &actorTex);
+	actorCubeObj = new CObject(&programNoFog, actorCube->GetVAO(), actorCube->GetIndiceCount(), gameCamera, &actorTex);
 
 
 	// Create Skybox
@@ -61,12 +64,8 @@ void CPlayScene::Render()
 	{
 		glPolygonMode(GL_FRONT, GL_LINE);
 	}
-
 	
-	actorCubeTwoObj->Render();
-
-
-
+	actorCubeObj->Render();
 	gameSkybox->Render();
 
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -110,7 +109,7 @@ void CPlayScene::Update(GLfloat* deltaTime, ESceneManager* _currentScene)
 	}
 	
 	gameSkybox->Update();
-	actorCubeTwoObj->Update();
+	actorCubeObj->Update();
 
 	// Resets every thing in game scene
 	if (gameInput->getKeyState('r') || gameInput->getKeyState('R'))
