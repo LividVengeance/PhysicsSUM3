@@ -1,7 +1,7 @@
 #include "CCloth.h"
 
 CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth, 
-	int _particleHeight, float _mass, float _damping, glm::mat4 _modelMatrix, GLuint* _texture)
+	int _particleHeight, float _mass, float _damping, glm::mat4 _modelMatrix, CCamera* _gameCamera)
 {
 	clothHeight = _clothHeight;
 	clothWidth = _clothWidth;
@@ -10,7 +10,16 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	mass = _mass;
 	damping = _damping;
 	modelMatrix = _modelMatrix;
-	texture = _texture;
+	gameCamera = _gameCamera;
+
+	program = CShaderLoader::CreateProgram("Resources/Shaders/Basic.vs",
+		"Resources/Shaders/Basic.fs");
+
+	// Gen Textures For Actor
+	const char* fileLocationBullet = "Resources/Textures/BackgroundSprite.png";
+	TextureGen(fileLocationBullet, texture);
+
+	partMesh = new CCube(1.0f);
 
 	// Particle Var Setup
 	float distPartX = clothWidth / particleWidth;
@@ -25,23 +34,41 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 		for (int j = 0; j < particleWidth; j++)
 		{
 			glm::vec3 partPos = (glm::vec3)(modelMatrix * glm::vec4(i * distPartX, -j * distPartY, 0, 1));
-			allPartsInCloth.push_back(CParticle(partPos, partMass, partDamping));
+			allPartsInCloth.push_back(CParticle(partPos, partMass, partDamping, partMesh, program, texture, gameCamera));
 		}
 	}
 
-	// Creates the Triangles between the Particels on the cloth
-	for (int i = 0; i < particleHeight; i++)
+	// Creates the Constraints Between all Particles in Cloth
+	for (int i = 0; i < numPart; i++)
 	{
-		for (int j = 0; j < particleWidth; j++)
+		// Horizontal
+		if (!(i % particleWidth == 0))
 		{
-			CParticle* p1 = &allPartsInCloth[(i - 1) * particleWidth + j - 1];
-			CParticle* p2 = &allPartsInCloth[(i - 1) * particleWidth + j];
-			CParticle* p3 = &allPartsInCloth[i * particleWidth + j - 1];
-			CParticle* p4 = &allPartsInCloth[i* particleWidth + j];
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1]));
+		}
+		if ((i % particleWidth == 0) || (i - 1) % particleWidth == 0)
+		{
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1]));
+		}
 
-			triangles.push_back(CTriangle(p3, p1, p2));
-			triangles.push_back(CTriangle(p2, p4, p3));
+		// Vertical
+		if (!(i < particleWidth))
+		{
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - particleWidth]));
+		}
+		if (!(i < particleWidth * 2))
+		{
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - (particleWidth * 2)]));
+		}
 
+		// Diagonal
+		if (!(i < particleWidth) && !(i % particleWidth == 0))
+		{
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1 - particleWidth]));
+		}
+		if (!(i < particleWidth) && !((i + 1) % particleWidth == 0))
+		{
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i + 1 - particleWidth]));
 		}
 	}
 
@@ -56,12 +83,62 @@ CCloth::~CCloth()
 {
 }
 
-void CCloth::Update()
+void CCloth::Update(float _deltaTime)
 {
+	// Applying Gravity to All Particles
+	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
+	{
+		allPartsInCloth[i].force += glm::vec3(0, -0.3, 0) * _deltaTime;
+	}
 
+	for (int i = 0; i < 20; i++)
+	{
+		for (std::vector<CConstraints>::size_type j = 0; j < allConsnInCloth.size(); j++)
+		{
+			allConsnInCloth[j].Satisfy();
+		}
+	}
+
+	// Apply Forces to All Particles
+	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
+	{
+		allPartsInCloth[i].Update(_deltaTime);
+	}
 }
 
 void CCloth::Render()
 {
+	// Render all the particles on the cloth
+	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
+	{
+		allPartsInCloth[i].Render();
+	}
 
+	for (std::vector<CConstraints>::size_type i = 0; i < allConsnInCloth.size(); i++)
+	{
+		allConsnInCloth[i].Render();
+	}
+}
+
+void CCloth::TextureGen(const char* textureLocation, GLuint* texture)
+{
+	glGenTextures(1, texture);
+	glBindTexture(GL_TEXTURE_2D, *texture);
+
+	int width, height;
+	unsigned char* image1 = SOIL_load_image(textureLocation, &width, &height, 0, SOIL_LOAD_RGBA);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+	SOIL_free_image_data(image1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }

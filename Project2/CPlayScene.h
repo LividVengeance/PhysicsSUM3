@@ -8,6 +8,9 @@
 // Actors
 #include "CActor.h"
 
+// Physics
+#include "CCloth.h"
+
 // Meshes
 #include "CPyramid.h"
 #include "CSphere.h"
@@ -49,6 +52,8 @@ private:
 	CPlane* actorPlane;
 	CCube* actorMeshTest;
 	CSkybox* gameSkybox;
+
+	CCloth* clothSim;
 
 	// Objects
 	CObject* actorCubeObj;

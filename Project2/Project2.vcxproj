@@ -147,6 +147,7 @@
     <ClCompile Include="CAudio.cpp" />
     <ClCompile Include="CCamera.cpp" />
     <ClCompile Include="CCloth.cpp" />
+    <ClCompile Include="CConstraints.cpp" />
     <ClCompile Include="CCube.cpp" />
     <ClCompile Include="CGameManager.cpp" />
     <ClCompile Include="CInput.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="CAudio.h" />
     <ClInclude Include="CCamera.h" />
     <ClInclude Include="CCloth.h" />
+    <ClInclude Include="CConstraints.h" />
     <ClInclude Include="CCube.h" />
     <ClInclude Include="CGameManager.h" />
     <ClInclude Include="CInput.h" />

@@ -33,6 +33,8 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	// Create Game Actors
 	actorCubeObj = new CObject(&programNoFog, actorCube->GetVAO(), actorCube->GetIndiceCount(), gameCamera, &actorTex);
 
+	glm::mat4 modelMatrix;
+	clothSim = new CCloth(100.0f, 50.0f, 100.0f, 50.0f, 100.0f, 0.01, modelMatrix, gameCamera);
 
 	// Create Skybox
 	gameSkybox = new CSkybox(&programSkybox, gameCamera);
