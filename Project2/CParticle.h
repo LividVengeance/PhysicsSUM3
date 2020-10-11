@@ -11,7 +11,7 @@ class CParticle
 {
 public:
 	CParticle(glm::vec3 _pos, float _mass, float _damping, CCube* _partMesh, 
-		GLint _program, GLuint* texture, CCamera* _gameCamera);
+		GLuint* _program, GLuint* texture, CCamera* _gameCamera);
 	~CParticle();
 
 	void Move(glm::vec3 _delta);
@@ -37,7 +37,7 @@ private:
 	glm::mat4 objModelMatrix;
 
 	CCube* partMesh;
-	GLint program;
+	GLuint* program;
 	GLuint* texture;
 	CCamera* gameCamera;
 };

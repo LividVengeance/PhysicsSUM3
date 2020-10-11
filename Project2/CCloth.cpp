@@ -1,7 +1,7 @@
 #include "CCloth.h"
 
 CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth, 
-	int _particleHeight, float _mass, float _damping, glm::mat4 _modelMatrix, CCamera* _gameCamera)
+	int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos, CCamera* _gameCamera)
 {
 	clothHeight = _clothHeight;
 	clothWidth = _clothWidth;
@@ -9,7 +9,7 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	particleWidth = _particleWidth;
 	mass = _mass;
 	damping = _damping;
-	modelMatrix = _modelMatrix;
+	clothPos = _clothPos;
 	gameCamera = _gameCamera;
 
 	program = CShaderLoader::CreateProgram("Resources/Shaders/Basic.vs",
@@ -17,9 +17,9 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 
 	// Gen Textures For Actor
 	const char* fileLocationBullet = "Resources/Textures/BackgroundSprite.png";
-	TextureGen(fileLocationBullet, texture);
+	TextureGen(fileLocationBullet, &texture);
 
-	partMesh = new CCube(1.0f);
+	partMesh = new CCube(0.10f);
 
 	// Particle Var Setup
 	float distPartX = clothWidth / particleWidth;
@@ -33,24 +33,15 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	{
 		for (int j = 0; j < particleWidth; j++)
 		{
-			glm::vec3 partPos = (glm::vec3)(modelMatrix * glm::vec4(i * distPartX, -j * distPartY, 0, 1));
-			allPartsInCloth.push_back(CParticle(partPos, partMass, partDamping, partMesh, program, texture, gameCamera));
+			//glm::vec3 partPos = (glm::vec3)(modelMatrix * glm::vec4(i * distPartX, -j * distPartY, 0, 1));
+			glm::vec3 partPos = vec3(clothPos + vec3(i * distPartX, -j * distPartY, 0.0f));
+			allPartsInCloth.push_back(CParticle(partPos, partMass, partDamping, partMesh, &program, &texture, gameCamera));
 		}
 	}
 
 	// Creates the Constraints Between all Particles in Cloth
 	for (int i = 0; i < numPart; i++)
 	{
-		// Horizontal
-		if (!(i % particleWidth == 0))
-		{
-			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1]));
-		}
-		if ((i % particleWidth == 0) || (i - 1) % particleWidth == 0)
-		{
-			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1]));
-		}
-
 		// Vertical
 		if (!(i < particleWidth))
 		{
@@ -60,7 +51,17 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 		{
 			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - (particleWidth * 2)]));
 		}
-
+	
+		// Horizontal
+		if (!(i % particleWidth == 0))
+		{
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1]));
+		}
+		if (!((i % particleWidth == 0) || (i - 1) % particleWidth == 0))
+		{
+			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1]));
+		}
+		
 		// Diagonal
 		if (!(i < particleWidth) && !(i % particleWidth == 0))
 		{
@@ -73,10 +74,14 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	}
 
 	allPartsInCloth[numPart / 2 + particleWidth / 2].force.z -= 1;
-
+	
 	// Pins the Top Left and Right - To Keep Cloth Up
 	allPartsInCloth[0].moveable = false;
 	allPartsInCloth[particleWidth - 1].moveable = false;
+
+	std::cout << "Total numer of particles: " << allPartsInCloth.size() << std::endl;
+	std::cout << "First particle pos: " << allPartsInCloth[0].pos.x << ", "  << allPartsInCloth[0].pos.y << ", " << allPartsInCloth[0].pos.z << std::endl;
+	std::cout << "Second particle pos: " << allPartsInCloth[20].pos.x << ", " << allPartsInCloth[1].pos.y << ", " << allPartsInCloth[1].pos.z << std::endl;
 }
 
 CCloth::~CCloth()
@@ -111,7 +116,8 @@ void CCloth::Render()
 	// Render all the particles on the cloth
 	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
 	{
-		allPartsInCloth[i].Render();
+		//if(i != 0)
+			allPartsInCloth[i].Render();
 	}
 
 	for (std::vector<CConstraints>::size_type i = 0; i < allConsnInCloth.size(); i++)

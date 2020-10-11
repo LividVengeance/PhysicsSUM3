@@ -28,13 +28,15 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 
 	// Creates Mesh
 	actorPyramid = new CPyramid();
-	actorCube = new CCube(1.0f);
+	actorCube = new CCube(0.1f);
+
+	//partTest = new CParticle(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, -2.0f, actorCube, &programNoFog, &actorTex, gameCamera);
 
 	// Create Game Actors
 	actorCubeObj = new CObject(&programNoFog, actorCube->GetVAO(), actorCube->GetIndiceCount(), gameCamera, &actorTex);
 
-	glm::mat4 modelMatrix;
-	clothSim = new CCloth(100.0f, 50.0f, 100.0f, 50.0f, 100.0f, 0.01, modelMatrix, gameCamera);
+
+	clothSim = new CCloth(10.0f, 5.0f, 20.0f, 10.0f, 100.0f, 0.01, glm::vec3(0.0f, 0.0f, 0.0f), gameCamera);
 
 	// Create Skybox
 	gameSkybox = new CSkybox(&programSkybox, gameCamera);
@@ -45,7 +47,7 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 
 CPlayScene::~CPlayScene()
 {
-}
+} 
 
 void CPlayScene::Render()
 {
@@ -67,8 +69,10 @@ void CPlayScene::Render()
 		glPolygonMode(GL_FRONT, GL_LINE);
 	}
 	
-	actorCubeObj->Render();
+	//actorCubeObj->Render();
 	gameSkybox->Render();
+	clothSim->Render();
+	//partTest->Render();
 
 	glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -111,7 +115,9 @@ void CPlayScene::Update(GLfloat* deltaTime, ESceneManager* _currentScene)
 	}
 	
 	gameSkybox->Update();
-	actorCubeObj->Update();
+	//actorCubeObj->Update();
+	clothSim->Update(*deltaTime);
+	//partTest->Update(*deltaTime);
 
 	// Resets every thing in game scene
 	if (gameInput->getKeyState('r') || gameInput->getKeyState('R'))

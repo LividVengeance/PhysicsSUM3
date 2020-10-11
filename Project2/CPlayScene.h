@@ -53,6 +53,8 @@ private:
 	CCube* actorMeshTest;
 	CSkybox* gameSkybox;
 
+	CParticle* partTest;
+
 	CCloth* clothSim;
 
 	// Objects

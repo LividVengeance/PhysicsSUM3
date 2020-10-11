@@ -149,6 +149,7 @@
     <ClCompile Include="CCloth.cpp" />
     <ClCompile Include="CConstraints.cpp" />
     <ClCompile Include="CCube.cpp" />
+    <ClCompile Include="CFloor.cpp" />
     <ClCompile Include="CGameManager.cpp" />
     <ClCompile Include="CInput.cpp" />
     <ClCompile Include="CMainMenuScene.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="CCloth.h" />
     <ClInclude Include="CConstraints.h" />
     <ClInclude Include="CCube.h" />
+    <ClInclude Include="CFloor.h" />
     <ClInclude Include="CGameManager.h" />
     <ClInclude Include="CInput.h" />
     <ClInclude Include="CMainMenuScene.h" />

@@ -12,6 +12,7 @@
 #include "CCube.h"
 
 #include <vector>
+#include <iostream>
 
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
@@ -21,7 +22,7 @@ class CCloth
 {
 public:
 	CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
-		int _particleHeight, float _mass, float _damping, glm::mat4 _modelMatrix, 
+		int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos,
 		CCamera* _gameCamera);
 	~CCloth();
 
@@ -29,7 +30,7 @@ public:
 	void Render();
 
 private:
-	void TextureGen(const char* textureLocation, GLuint* texture);
+	void TextureGen(const char* textureLocation, GLuint *texture);
 
 	float clothWidth;
 	float clothHeight;
@@ -41,9 +42,9 @@ private:
 	std::vector<CParticle> allPartsInCloth;
 	std::vector<CConstraints> allConsnInCloth;
 
-	glm::mat4 modelMatrix;
-	GLuint* texture;
-	GLint program;
+	glm::vec3 clothPos;
+	GLuint texture;
+	GLuint program;
 	CCube* partMesh;
 	CCamera* gameCamera;
 };
