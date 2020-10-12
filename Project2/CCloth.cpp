@@ -1,7 +1,8 @@
 #include "CCloth.h"
 
 CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth, 
-	int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos, CCamera* _gameCamera)
+	int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos, 
+	CCamera* _gameCamera, CInput* _gameInputs)
 {
 	clothHeight = _clothHeight;
 	clothWidth = _clothWidth;
@@ -11,6 +12,7 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	damping = _damping;
 	clothPos = _clothPos;
 	gameCamera = _gameCamera;
+	gameInput = _gameInputs;
 
 	program = CShaderLoader::CreateProgram("Resources/Shaders/Basic.vs",
 		"Resources/Shaders/Basic.fs");
@@ -76,13 +78,13 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	allPartsInCloth[numPart / 2 + particleWidth / 2].force.z -= 1;
 	
 	// Pins the Top Left and Right - To Keep Cloth Up
-	allPartsInCloth[0].moveable = false;
-	allPartsInCloth[particleWidth - 1].moveable = false;
+	allPartsInCloth[0].isFrozen = true;
+	allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = true;
 
-	std::cout << "Total numer of particles: " << allPartsInCloth.size() << std::endl;
-	std::cout << "First particle pos: " << allPartsInCloth[0].pos.x << ", "  << allPartsInCloth[0].pos.y << ", " << allPartsInCloth[0].pos.z << std::endl;
-	std::cout << "Second particle pos: " << allPartsInCloth[20].pos.x << ", " << allPartsInCloth[1].pos.y << ", " << allPartsInCloth[1].pos.z << std::endl;
-}
+	//std::cout << "Total numer of particles: " << allPartsInCloth.size() << std::endl;
+	//std::cout << "First particle pos: " << allPartsInCloth[0].pos.x << ", "  << allPartsInCloth[0].pos.y << ", " << allPartsInCloth[0].pos.z << std::endl;
+	//std::cout << "Second particle pos: " << allPartsInCloth[20].pos.x << ", " << allPartsInCloth[1].pos.y << ", " << allPartsInCloth[1].pos.z << std::endl;
+}	//
 
 CCloth::~CCloth()
 {
@@ -95,7 +97,7 @@ void CCloth::Update(float _deltaTime)
 	{
 		allPartsInCloth[i].force += glm::vec3(0, -0.3, 0) * _deltaTime;
 	}
-
+	
 	for (int i = 0; i < 20; i++)
 	{
 		for (std::vector<CConstraints>::size_type j = 0; j < allConsnInCloth.size(); j++)
@@ -103,11 +105,21 @@ void CCloth::Update(float _deltaTime)
 			allConsnInCloth[j].Satisfy();
 		}
 	}
-
+	
 	// Apply Forces to All Particles
 	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
 	{
 		allPartsInCloth[i].Update(_deltaTime);
+	}
+
+	// Pin Updates
+	if (gameInput->getKeyState('1'))
+	{
+		allPartsInCloth[0].isFrozen = !allPartsInCloth[0].isFrozen;
+	}
+	if (gameInput->getKeyState('2'))
+	{
+		allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = !allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen;
 	}
 }
 
@@ -116,14 +128,17 @@ void CCloth::Render()
 	// Render all the particles on the cloth
 	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
 	{
-		//if(i != 0)
+		//if (i == 1)
+		{
 			allPartsInCloth[i].Render();
+		}
+			
 	}
 
-	for (std::vector<CConstraints>::size_type i = 0; i < allConsnInCloth.size(); i++)
-	{
-		allConsnInCloth[i].Render();
-	}
+	//for (std::vector<CConstraints>::size_type i = 0; i < allConsnInCloth.size(); i++)
+	//{
+	//	allConsnInCloth[i].Render();
+	//}
 }
 
 void CCloth::TextureGen(const char* textureLocation, GLuint* texture)

@@ -4,6 +4,7 @@ CParticle::CParticle(glm::vec3 _pos, float _mass, float _damping, CCube* _partMe
 	GLuint*_program, GLuint* _texture, CCamera* _gameCamera)
 {
 	pos = _pos;
+	prevPos = pos;
 	mass = _mass;
 	damping = _damping;
 	program = _program;
@@ -11,10 +12,10 @@ CParticle::CParticle(glm::vec3 _pos, float _mass, float _damping, CCube* _partMe
 	texture = _texture;
 	gameCamera = _gameCamera;
 
-	moveable = true;
+	isFrozen = false;
 	force = glm::vec3(0.0f, 0.0f, 0.0f);
 	objAngleRotation = 0.0f;
-	objRotaion = glm::vec3(0.0f, 0.0f, 0.0f);
+	objRotaion = glm::vec3(0.0f, 1.0f, 0.0f);
 	objScale = glm::vec3(1.0f, 1.0f, 1.0f);
 	objScaleAmount = 1.0f;
 }
@@ -26,11 +27,7 @@ CParticle::~CParticle()
 void CParticle::Move(glm::vec3 _delta)
 {
 	// Check if the particle is moveable
-	if (!moveable)
-	{
-		return;
-	}
-	else
+	if (!isFrozen)
 	{
 		pos += _delta;
 	}
@@ -38,16 +35,13 @@ void CParticle::Move(glm::vec3 _delta)
 
 void CParticle::Update(float _deltaTime)
 {
+	//force = glm::vec3(0.0f, 0.0f, 0.0f);
 	//Check if the particle is moveable
-	if (!moveable)
-	{
-		return;
-	}
-	else
+	if (!isFrozen)
 	{
 		// Applying The Force
 		glm::vec3 temp = pos;
-		pos += (pos - prevPos) * damping + (force / mass) * (_deltaTime / 100);
+		pos += (pos - prevPos) * damping + (force / mass) * (_deltaTime * 1000.0f);
 		prevPos = temp;
 		force = glm::vec3(0.0f, 0.0f, 0.0f);
 	}

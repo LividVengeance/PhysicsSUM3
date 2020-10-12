@@ -3,6 +3,7 @@
 // Utilites
 #include "CCamera.h"
 #include "CShaderLoader.h"
+#include "CInput.h"
 
 // Physics
 #include "CConstraints.h"
@@ -23,7 +24,7 @@ class CCloth
 public:
 	CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 		int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos,
-		CCamera* _gameCamera);
+		CCamera* _gameCamera, CInput* _gameInputs);
 	~CCloth();
 
 	void Update(float _deltaTime);
@@ -47,5 +48,6 @@ private:
 	GLuint program;
 	CCube* partMesh;
 	CCamera* gameCamera;
+	CInput* gameInput;
 };
 

@@ -18,7 +18,7 @@ public:
 	void Update(float _deltaTime);
 	void Render();
 	
-	bool moveable;
+	bool isFrozen;
 	glm::vec3 force;
 	glm::vec3 pos;
 
