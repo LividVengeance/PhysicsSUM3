@@ -64,23 +64,23 @@ vec3 CCamera::GetCamPos()
 void CCamera::MoveCamera(GLfloat deltaTime, bool moveRight)
 {
 	totalTime = moveRight ? totalTime += deltaTime : totalTime -= deltaTime;
-
-	camPos.x = sin(totalTime) * radius;
-	camPos.y = 1.5f;
-	camPos.z = cos(totalTime) * radius;
+	radius = 10.0f;
+	camPos.x = 1.0f;//sin(totalTime) * radius;
+	camPos.y = 1.0f;
+	camPos.z = 10.0f;//cos(totalTime) * radius;
 }
 
 void CCamera::CameraRadius(float newRadius)
 {
-	radius += newRadius;
+	//radius += newRadius;
 }
 
 void CCamera::ResetCamPos()
 {
 	// Setting defualt Camera Positions
-	camPos.x = 4.9f;
-	camPos.y = 1.5f;
-	camPos.z = 3.0f;
-
-	radius = 5.0f;
+	//camPos.x = 4.9f;
+	//camPos.y = 1.5f;
+	//camPos.z = 3.0f;
+	//
+	//radius = 5.0f;
 }

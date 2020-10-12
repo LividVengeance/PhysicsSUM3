@@ -4,6 +4,7 @@
 #include "CCamera.h"
 #include "CShaderLoader.h"
 #include "CInput.h"
+#include "CFloor.h"
 
 // Physics
 #include "CConstraints.h"
@@ -32,13 +33,15 @@ public:
 
 private:
 	void TextureGen(const char* textureLocation, GLuint *texture);
-
+	void PinUpdates();
 	float clothWidth;
 	float clothHeight;
 	int particleWidth;
 	int particleHeight;
 	float mass;
 	float damping;
+
+	int currentSelected;
 
 	std::vector<CParticle> allPartsInCloth;
 	std::vector<CConstraints> allConsnInCloth;
@@ -49,5 +52,6 @@ private:
 	CCube* partMesh;
 	CCamera* gameCamera;
 	CInput* gameInput;
+	CFloor* floor;
 };
 

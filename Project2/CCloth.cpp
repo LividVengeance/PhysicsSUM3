@@ -80,7 +80,9 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	// Pins the Top Left and Right - To Keep Cloth Up
 	allPartsInCloth[0].isFrozen = true;
 	allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = true;
+	currentSelected = 1;
 
+	floor = new CFloor(glm::vec3(0.0f, -3.0f, 0.0f), 100.0f, 100.0f);
 	//std::cout << "Total numer of particles: " << allPartsInCloth.size() << std::endl;
 	//std::cout << "First particle pos: " << allPartsInCloth[0].pos.x << ", "  << allPartsInCloth[0].pos.y << ", " << allPartsInCloth[0].pos.z << std::endl;
 	//std::cout << "Second particle pos: " << allPartsInCloth[20].pos.x << ", " << allPartsInCloth[1].pos.y << ", " << allPartsInCloth[1].pos.z << std::endl;
@@ -112,15 +114,8 @@ void CCloth::Update(float _deltaTime)
 		allPartsInCloth[i].Update(_deltaTime);
 	}
 
-	// Pin Updates
-	if (gameInput->getKeyState('1'))
-	{
-		allPartsInCloth[0].isFrozen = !allPartsInCloth[0].isFrozen;
-	}
-	if (gameInput->getKeyState('2'))
-	{
-		allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = !allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen;
-	}
+	floor->Update(&allPartsInCloth);
+	PinUpdates();
 }
 
 void CCloth::Render()
@@ -139,6 +134,47 @@ void CCloth::Render()
 	//{
 	//	allConsnInCloth[i].Render();
 	//}
+}
+
+void CCloth::PinUpdates()
+{
+	// Updates the current selected pin
+	if (gameInput->getKeyState('1'))
+	{
+		currentSelected = 1;
+	}
+	if (gameInput->getKeyState('2'))
+	{
+		currentSelected = 2;
+	}
+
+	// Release the pin of sellected pin
+	if ((gameInput->getKeyState('t') || gameInput->getKeyState('T')) && (currentSelected == 1))
+	{
+		allPartsInCloth[0].isFrozen = !allPartsInCloth[0].isFrozen;
+	}
+	if ((gameInput->getKeyState('t') || gameInput->getKeyState('T')) && (currentSelected == 2))
+	{
+		allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = !allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen;
+	}
+
+	// Moves the selected pin
+	if ((gameInput->getKeyState('o') || gameInput->getKeyState('O')) && (currentSelected == 1))
+	{
+		allPartsInCloth[0].pos.x -= 0.1f;
+	}
+	if ((gameInput->getKeyState('p') || gameInput->getKeyState('P')) && (currentSelected == 1))
+	{
+		allPartsInCloth[0].pos.x += 0.1f;
+	}
+	if ((gameInput->getKeyState('o') || gameInput->getKeyState('O')) && (currentSelected == 2))
+	{
+		allPartsInCloth[allPartsInCloth.size() - particleWidth].pos.x -= 0.1f;
+	}
+	if ((gameInput->getKeyState('p') || gameInput->getKeyState('P')) && (currentSelected == 2))
+	{
+		allPartsInCloth[allPartsInCloth.size() - particleWidth].pos.x += 0.1f;
+	}
 }
 
 void CCloth::TextureGen(const char* textureLocation, GLuint* texture)
