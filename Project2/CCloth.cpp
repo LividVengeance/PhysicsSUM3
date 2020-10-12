@@ -1,7 +1,7 @@
 #include "CCloth.h"
 
-CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth, 
-	int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos, 
+CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
+	int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos,
 	CCamera* _gameCamera, CInput* _gameInputs)
 {
 	clothHeight = _clothHeight;
@@ -25,7 +25,7 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 
 	// Particle Var Setup
 	float distPartX = clothWidth / particleWidth;
-	float distPartY = clothHeight/ particleHeight;
+	float distPartY = clothHeight / particleHeight;
 	float numPart = particleWidth * particleHeight;
 	float partMass = numPart / mass;
 	float partDamping = 1 - damping;
@@ -53,7 +53,7 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 		{
 			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - (particleWidth * 2)]));
 		}
-	
+
 		// Horizontal
 		if (!(i % particleWidth == 0))
 		{
@@ -63,7 +63,7 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 		{
 			allConsnInCloth.push_back(CConstraints(&allPartsInCloth[i], &allPartsInCloth[i - 1]));
 		}
-		
+
 		// Diagonal
 		if (!(i < particleWidth) && !(i % particleWidth == 0))
 		{
@@ -76,17 +76,14 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	}
 
 	allPartsInCloth[numPart / 2 + particleWidth / 2].force.z -= 1;
-	
+
 	// Pins the Top Left and Right - To Keep Cloth Up
 	allPartsInCloth[0].isFrozen = true;
 	allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = true;
 	currentSelected = 1;
 
-	floor = new CFloor(glm::vec3(0.0f, -3.0f, 0.0f), 100.0f, 100.0f);
-	//std::cout << "Total numer of particles: " << allPartsInCloth.size() << std::endl;
-	//std::cout << "First particle pos: " << allPartsInCloth[0].pos.x << ", "  << allPartsInCloth[0].pos.y << ", " << allPartsInCloth[0].pos.z << std::endl;
-	//std::cout << "Second particle pos: " << allPartsInCloth[20].pos.x << ", " << allPartsInCloth[1].pos.y << ", " << allPartsInCloth[1].pos.z << std::endl;
-}	//
+	floor = new CFloor(glm::vec3(0.0f, -4.0f, 0.0f), 100.0f, 100.0f);
+}
 
 CCloth::~CCloth()
 {
@@ -98,6 +95,16 @@ void CCloth::Update(float _deltaTime)
 	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
 	{
 		allPartsInCloth[i].force += glm::vec3(0, -0.3, 0) * _deltaTime;
+
+		// Adding wind
+		if ((gameInput->getKeyState('f') || gameInput->getKeyState('F')))
+		{
+			allPartsInCloth[i].force += glm::vec3(0, 0, -3) * _deltaTime;
+		}
+		if ((gameInput->getKeyState('g') || gameInput->getKeyState('G')))
+		{
+			allPartsInCloth[i].force += glm::vec3(0, 0, 3) * _deltaTime;
+		}
 	}
 	
 	for (int i = 0; i < 20; i++)
@@ -116,6 +123,11 @@ void CCloth::Update(float _deltaTime)
 
 	floor->Update(&allPartsInCloth);
 	PinUpdates();
+
+	if (gameInput->getKeyState('r') || gameInput->getKeyState('R'))
+	{
+		ResetCloth();
+	}
 }
 
 void CCloth::Render()
@@ -158,6 +170,8 @@ void CCloth::PinUpdates()
 		allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = !allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen;
 	}
 
+	
+
 	// Moves the selected pin
 	if ((gameInput->getKeyState('o') || gameInput->getKeyState('O')) && (currentSelected == 1))
 	{
@@ -175,6 +189,11 @@ void CCloth::PinUpdates()
 	{
 		allPartsInCloth[allPartsInCloth.size() - particleWidth].pos.x += 0.1f;
 	}
+}
+
+void CCloth::ResetCloth()
+{
+
 }
 
 void CCloth::TextureGen(const char* textureLocation, GLuint* texture)

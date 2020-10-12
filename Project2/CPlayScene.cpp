@@ -36,7 +36,7 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	actorCubeObj = new CObject(&programNoFog, actorCube->GetVAO(), actorCube->GetIndiceCount(), gameCamera, &actorTex);
 
 
-	clothSim = new CCloth(10.0f, 5.0f, 20.0f, 10.0f, 100.0f, 0.01, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+	clothSim = new CCloth(10.0f, 10.0f, 10.0f, 10.0f, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
 
 	// Create Skybox
 	gameSkybox = new CSkybox(&programSkybox, gameCamera);
@@ -58,7 +58,7 @@ void CPlayScene::Render()
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 
-	restartLabel->Render(); // Call before scissor test
+	//restartLabel->Render(); // Call before scissor test
 
 	// Enables and declares scissor rectangle
 	glEnable(GL_SCISSOR_TEST);

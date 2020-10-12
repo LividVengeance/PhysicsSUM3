@@ -34,6 +34,8 @@ public:
 private:
 	void TextureGen(const char* textureLocation, GLuint *texture);
 	void PinUpdates();
+	void ResetCloth();
+
 	float clothWidth;
 	float clothHeight;
 	int particleWidth;

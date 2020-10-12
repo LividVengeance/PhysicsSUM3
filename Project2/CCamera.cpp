@@ -65,9 +65,9 @@ void CCamera::MoveCamera(GLfloat deltaTime, bool moveRight)
 {
 	totalTime = moveRight ? totalTime += deltaTime : totalTime -= deltaTime;
 	radius = 10.0f;
-	camPos.x = 1.0f;//sin(totalTime) * radius;
+	camPos.x = 0.0f;//sin(totalTime) * radius;
 	camPos.y = 1.0f;
-	camPos.z = 10.0f;//cos(totalTime) * radius;
+	camPos.z = 12.0f;//cos(totalTime) * radius;
 }
 
 void CCamera::CameraRadius(float newRadius)
