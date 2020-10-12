@@ -45,8 +45,8 @@ private:
 
 	int currentSelected;
 
-	std::vector<CParticle> allPartsInCloth;
-	std::vector<CConstraints> allConsnInCloth;
+	std::vector<CParticle*> allPartsInCloth;
+	std::vector<CConstraints*> allConsnInCloth;
 
 	glm::vec3 clothPos;
 	GLuint texture;

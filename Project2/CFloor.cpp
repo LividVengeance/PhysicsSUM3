@@ -16,14 +16,14 @@ void CFloor::Render()
 
 }
 
-void CFloor::Update(std::vector<CParticle>* allPartsInCloth)
+void CFloor::Update(std::vector<CParticle*> allPartsInCloth)
 {
-	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth->size(); i++)
+	for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
 	{
-		glm::vec3 partPos = (*allPartsInCloth)[i].pos;
+		glm::vec3 partPos = (allPartsInCloth)[i]->pos;
 		if (partPos.y <= pos.y)
 		{
-			(*allPartsInCloth)[i].pos += glm::vec3(0, pos.y - partPos.y, 0);
+			(allPartsInCloth)[i]->pos += glm::vec3(0, pos.y - partPos.y, 0);
 		}
 	}
 }

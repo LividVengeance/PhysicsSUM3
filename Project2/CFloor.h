@@ -12,7 +12,7 @@ public:
 	CFloor(glm::vec3 _pos, float _width, float _depth);
 	~CFloor();
 	void Render();
-	void Update(std::vector<CParticle>* allPartsInCloth);
+	void Update(std::vector<CParticle*> allPartsInCloth);
 
 private:
 	glm::vec3 pos;

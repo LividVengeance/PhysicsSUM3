@@ -122,7 +122,10 @@ void CPlayScene::Update(GLfloat* deltaTime, ESceneManager* _currentScene)
 	// Resets every thing in game scene
 	if (gameInput->getKeyState('r') || gameInput->getKeyState('R'))
 	{
-		gameCamera->ResetCamPos(); // This is the only thing in the scene that changes
+		//gameCamera->ResetCamPos(); // This is the only thing in the scene that changes
+		delete clothSim;
+		clothSim = new CCloth(10.0f, 10.0f, 10.0f, 10.0f, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+
 	}
 }
 
