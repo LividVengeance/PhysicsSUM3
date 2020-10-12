@@ -160,6 +160,13 @@ void CCloth::PinUpdates()
 		currentSelected = 2;
 	}
 
+	// Relesae all pins
+	if (gameInput->getKeyState('u') || gameInput->getKeyState('U'))
+	{
+		allPartsInCloth[0].isFrozen = false;
+		allPartsInCloth[allPartsInCloth.size() - particleWidth].isFrozen = false;
+	}
+
 	// Release the pin of sellected pin
 	if ((gameInput->getKeyState('t') || gameInput->getKeyState('T')) && (currentSelected == 1))
 	{
