@@ -91,6 +91,11 @@ CCloth::~CCloth()
 	{
 		delete allPartsInCloth[i];
 	}
+
+	for (std::vector<CConstraints>::size_type j = 0; j < allConsnInCloth.size(); j++)
+	{
+		delete allConsnInCloth[j];
+	}
 }
 
 void CCloth::Update(float _deltaTime)
