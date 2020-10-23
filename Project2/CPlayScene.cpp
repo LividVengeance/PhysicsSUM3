@@ -16,30 +16,7 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	programSkybox = CShaderLoader::CreateProgram("Resources/Shaders/skybox.vs",
 		"Resources/Shaders/skybox.fs");
 
-	// Generate Texte
-	const char* fileLocation = "Resources/Textures/BackgroundSprite.png";
-	TextureGen(fileLocation, &actorTex);
-
-	const char* cubeFileLocation = "Resources/Textures/dropSprite.png";
-	TextureGen(cubeFileLocation, &dropTex);
-
-	const char* waterFileLocation = "Resources/Textures/resetSprite.png";
-	TextureGen(waterFileLocation, &resetTex);
-
-	const char* increaseLocation = "Resources/Textures/increase.png";
-	TextureGen(increaseLocation, &increasePinTex);
-
-	const char* decreaseLocation = "Resources/Textures/decrease.png";
-	TextureGen(decreaseLocation, &decreasePinTex);
-
-	const char* applyLocation = "Resources/Textures/applySprite.png";
-	TextureGen(applyLocation, &applyWindTex);
-
-	const char* windRightLocation = "Resources/Textures/windRight.png";
-	TextureGen(windRightLocation, &windleftTex);
-
-	const char* windLeftLocation = "Resources/Textures/windLeft.png";
-	TextureGen(windLeftLocation, &windrightTex);
+	LoadTextures();
 
 	// Creates Mesh
 	actorPyramid = new CPyramid();
@@ -50,6 +27,7 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	
 	// Cloth Sim
 	particleHeight = 10.0f;
+	particleWidth = 10.0f;
 	clothSim = new CCloth(particleHeight, 10.0f, 10.0f, 10.0f, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
 
 	// Create Skybox
@@ -76,6 +54,8 @@ void CPlayScene::Render()
 	windLeftObj->Render2D();
 	windRightObj->Render2D();
 	applyWindObj->Render2D();
+	widthObj->Render2D();
+	heightObj->Render2D();
 
 	// Enabling Culling
 	glFrontFace(GL_CCW);
@@ -220,17 +200,39 @@ void CPlayScene::ButtonChecks()
 	increasePinObj->Update();
 	if (Button(50, 50, increasePinObj))
 	{
-		particleHeight++;
-		delete clothSim;
-		clothSim = new CCloth(10.0f, 10.0f, 10.0f, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+		if (isWidth)
+		{
+			particleWidth++;
+			delete clothSim;
+			clothSim = new CCloth(10.0f, 10.0f, particleWidth, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+
+		}
+		else
+		{
+			particleHeight++;
+			delete clothSim;
+			clothSim = new CCloth(10.0f, 10.0f, particleWidth, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+
+		}
 	}
 
 	decreasePinObj->Update();
-	if (Button(50, 50, decreasePinObj) && particleHeight > 1)
+	if (Button(50, 50, decreasePinObj))
 	{
-		particleHeight--;
-		delete clothSim;
-		clothSim = new CCloth(10.0f, 10.0f, 10.0f, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+		if (isWidth)
+		{
+			particleWidth--;
+			delete clothSim;
+			clothSim = new CCloth(10.0f, 10.0f, particleWidth, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+
+		}
+		else
+		{
+			particleHeight--;
+			delete clothSim;
+			clothSim = new CCloth(10.0f, 10.0f, particleWidth, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+
+		}
 	}
 
 	windRightObj->Update();
@@ -249,6 +251,18 @@ void CPlayScene::ButtonChecks()
 	if (Button(150, 50, applyWindObj))
 	{
 		clothSim->apply = !clothSim->apply;
+	}
+
+	heightObj->Update();
+	if (Button(150, 50, heightObj))
+	{
+		isWidth = false;
+	}
+
+	widthObj->Update();
+	if (Button(150, 50, widthObj))
+	{
+		isWidth = true;
 	}
 }
 
@@ -269,25 +283,70 @@ void CPlayScene::InitButtons()
 	increasePlane = new CPlane(50.0f, 50.0f);
 	increasePinObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &increasePinTex);
 	increasePinObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 170;
-	increasePinObj->objPosition.y -= 150;
+	increasePinObj->objPosition.y -= 190;
 
 	// Decrease Pins
 	decreasePinObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &decreasePinTex);
 	decreasePinObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 70;
-	decreasePinObj->objPosition.y -= 150;
+	decreasePinObj->objPosition.y -= 190;
+
+	// Height 
+	heightObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &heightTex);
+	heightObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 170;
+	heightObj->objPosition.y -= 130;
+
+	// Widht
+	widthObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &widthTex);
+	widthObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 70;
+	widthObj->objPosition.y -= 130;
+
 
 	// Wind Right
 	windRightObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &windrightTex);
 	windRightObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 580;
-	windRightObj->objPosition.y -= 150;
+	windRightObj->objPosition.y -= 190;
 
 	// Wind Left
 	windLeftObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &windleftTex);
 	windLeftObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 470;
-	windLeftObj->objPosition.y -= 150;
+	windLeftObj->objPosition.y -= 190;
 
 	// Appy Wind
 	applyWindObj = new CObject(&program, dropPlane->GetVAO(), dropPlane->GetIndiceCount(), gameCamera, &applyWindTex);
 	applyWindObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 520;
 	applyWindObj->objPosition.y -= 250;
+}
+
+void CPlayScene::LoadTextures()
+{
+	// Generate Texte
+	const char* fileLocation = "Resources/Textures/BackgroundSprite.png";
+	TextureGen(fileLocation, &actorTex);
+
+	const char* cubeFileLocation = "Resources/Textures/dropSprite.png";
+	TextureGen(cubeFileLocation, &dropTex);
+
+	const char* waterFileLocation = "Resources/Textures/resetSprite.png";
+	TextureGen(waterFileLocation, &resetTex);
+
+	const char* increaseLocation = "Resources/Textures/increase.png";
+	TextureGen(increaseLocation, &increasePinTex);
+
+	const char* decreaseLocation = "Resources/Textures/decrease.png";
+	TextureGen(decreaseLocation, &decreasePinTex);
+
+	const char* applyLocation = "Resources/Textures/applySprite.png";
+	TextureGen(applyLocation, &applyWindTex);
+
+	const char* windRightLocation = "Resources/Textures/windRight.png";
+	TextureGen(windRightLocation, &windleftTex);
+
+	const char* windLeftLocation = "Resources/Textures/windLeft.png";
+	TextureGen(windLeftLocation, &windrightTex);
+
+	const char* heightLocation = "Resources/Textures/height.png";
+	TextureGen(heightLocation, &heightTex);
+
+	const char* widthLocation = "Resources/Textures/width.png";
+	TextureGen(widthLocation, &widthTex);
 }

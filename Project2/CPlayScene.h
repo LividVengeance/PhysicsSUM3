@@ -33,6 +33,7 @@ private:
 	bool Button(float width, float height, CObject* _buttonObj);
 	void ButtonChecks();
 	void InitButtons();
+	void LoadTextures();
 	bool isWireFrame = false;
 
 	// Programs
@@ -71,6 +72,8 @@ private:
 	GLuint windrightTex;
 	GLuint windleftTex;
 	GLuint applyWindTex;
+	GLuint heightTex;
+	GLuint widthTex;
 
 	// Text Labels
 	CTextLabel* restartLabel;
@@ -85,8 +88,13 @@ private:
 	CObject* increasePinObj;
 	CObject* decreasePinObj;
 	CObject* applyWindObj;
+	CObject* widthObj;
+	CObject* heightObj;
+
 
 	float mouseX;
 	float mouseY;
 	int particleHeight;
+	int particleWidth;
+	bool isWidth = false;
 };
