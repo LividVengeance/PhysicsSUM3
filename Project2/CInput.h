@@ -9,6 +9,7 @@
 #include "gtc/type_ptr.hpp"
 
 #include "Utilities.h"
+#include "CCamera.h"
 
 
 class CInput
@@ -18,7 +19,6 @@ public:
 	~CInput();
 
 	void ProcessInput();
-
 	bool getKeyState(char key);
 
 	// KeyBoard Inputs
@@ -29,6 +29,7 @@ public:
 	void MousePassiveMove(int x, int y);
 	void MouseClick(int button, int state, int x, int y);
 	void MouseMove(int x, int y);
+	bool UpdateMousePicking(CCamera* _camera, glm::vec3 _objPosition);
 
 	int getMouseX();
 	int getMouseY();
@@ -36,10 +37,11 @@ public:
 
 	bool GetFirstDown(int button);
 
-	int mouseX = 0;
-	int mouseY = 0;
-
 private:
 	InputState KeyState[255];
 	InputState MouseState[3];
+
+	int mouseX = 0;
+	int mouseY = 0;
+	glm::vec3 rayDirection;
 };

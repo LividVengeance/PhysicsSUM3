@@ -27,9 +27,13 @@ public:
 		int _particleHeight, float _mass, float _damping, glm::vec3 _clothPos,
 		CCamera* _gameCamera, CInput* _gameInputs);
 	~CCloth();
-
+	
 	void Update(float _deltaTime);
 	void Render();
+	std::vector<CParticle*> allPartsInCloth;
+	int particleWidth;
+	int wind = 0;
+	bool apply = false;
 
 private:
 	void TextureGen(const char* textureLocation, GLuint *texture);
@@ -38,18 +42,18 @@ private:
 
 	float clothWidth;
 	float clothHeight;
-	int particleWidth;
+	
 	int particleHeight;
 	float mass;
 	float damping;
 
 	int currentSelected;
 
-	std::vector<CParticle*> allPartsInCloth;
 	std::vector<CConstraints*> allConsnInCloth;
 
 	glm::vec3 clothPos;
 	GLuint texture;
+	GLuint selectedTex;
 	GLuint program;
 	CCube* partMesh;
 	CCamera* gameCamera;

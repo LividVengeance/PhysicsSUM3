@@ -1,6 +1,7 @@
 #pragma once
 #include "CCube.h"
 #include "CCamera.h"
+#include "CInput.h"
 
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
@@ -11,7 +12,7 @@ class CParticle
 {
 public:
 	CParticle(glm::vec3 _pos, float _mass, float _damping, CCube* _partMesh, 
-		GLuint* _program, GLuint* texture, CCamera* _gameCamera);
+		GLuint* _program, GLuint* texture, CCamera* _gameCamera, CInput* _gameInput);
 	~CParticle();
 
 	void Move(glm::vec3 _delta);
@@ -36,6 +37,7 @@ private:
 	float objScaleAmount;
 	glm::mat4 objModelMatrix;
 
+	CInput* gameInput;
 	CCube* partMesh;
 	GLuint* program;
 	GLuint* texture;

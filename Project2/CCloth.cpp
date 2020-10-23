@@ -21,6 +21,9 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 	const char* fileLocationBullet = "Resources/Textures/BackgroundSprite.png";
 	TextureGen(fileLocationBullet, &texture);
 
+	const char* waterLocation = "Resources/Textures/WaterSprite.png";
+	TextureGen(waterLocation, &selectedTex);
+
 	partMesh = new CCube(0.10f);
 
 	// Particle Var Setup
@@ -37,7 +40,7 @@ CCloth::CCloth(float _clothWidth, float _clothHeight, int _particleWidth,
 		{
 			//glm::vec3 partPos = (glm::vec3)(modelMatrix * glm::vec4(i * distPartX, -j * distPartY, 0, 1));
 			glm::vec3 partPos = vec3(clothPos + vec3(i * distPartX, -j * distPartY, 0.0f));
-			allPartsInCloth.push_back(new CParticle(partPos, partMass, partDamping, partMesh, &program, &texture, gameCamera));
+			allPartsInCloth.push_back(new CParticle(partPos, partMass, partDamping, partMesh, &program, &texture, gameCamera, gameInput));
 		}
 	}
 
@@ -106,15 +109,23 @@ void CCloth::Update(float _deltaTime)
 		allPartsInCloth[i]->force += glm::vec3(0, -0.3, 0) * _deltaTime;
 
 		// Adding wind
-		if ((gameInput->getKeyState('f') || gameInput->getKeyState('F')))
+		if ((gameInput->getKeyState('f') || gameInput->getKeyState('F')) || (wind == 1 && apply))
 		{
 			allPartsInCloth[i]->force += glm::vec3(0, 0, -3) * _deltaTime;
 		}
-		if ((gameInput->getKeyState('g') || gameInput->getKeyState('G')))
+		if ((gameInput->getKeyState('g') || gameInput->getKeyState('G')) || (wind == 2 && apply))
 		{
 			allPartsInCloth[i]->force += glm::vec3(0, 0, 3) * _deltaTime;
 		}
 	}
+
+	//for (std::vector<CParticle>::size_type i = 0; i < allPartsInCloth.size(); i++)
+	//{
+	//	if (gameInput->UpdateMousePicking(gameCamera, allPartsInCloth[i]->pos))
+	//	{
+	//		std::cout << "meme" << std::endl;
+	//	}
+	//}
 	
 	for (int i = 0; i < 20; i++)
 	{

@@ -30,7 +30,9 @@ public:
 
 private:
 	void TextureGen(const char* textureLocation, GLuint* texture);
-
+	bool Button(float width, float height, CObject* _buttonObj);
+	void ButtonChecks();
+	void InitButtons();
 	bool isWireFrame = false;
 
 	// Programs
@@ -62,9 +64,29 @@ private:
 
 	// Textures
 	GLuint actorTex;
-	GLuint actorWaterTex;
-	GLuint actorCubeTex;
+	GLuint resetTex;
+	GLuint dropTex;
+	GLuint increasePinTex;
+	GLuint decreasePinTex;
+	GLuint windrightTex;
+	GLuint windleftTex;
+	GLuint applyWindTex;
 
 	// Text Labels
 	CTextLabel* restartLabel;
+
+	// Buttons
+	CPlane* dropPlane;
+	CPlane* increasePlane;
+	CObject* dropObj;
+	CObject* windLeftObj;
+	CObject* windRightObj;
+	CObject* resetObj;
+	CObject* increasePinObj;
+	CObject* decreasePinObj;
+	CObject* applyWindObj;
+
+	float mouseX;
+	float mouseY;
+	int particleHeight;
 };

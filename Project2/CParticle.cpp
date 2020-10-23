@@ -1,7 +1,7 @@
 #include "CParticle.h"
 
 CParticle::CParticle(glm::vec3 _pos, float _mass, float _damping, CCube* _partMesh, 
-	GLuint*_program, GLuint* _texture, CCamera* _gameCamera)
+	GLuint*_program, GLuint* _texture, CCamera* _gameCamera, CInput* _gameInput)
 {
 	pos = _pos;
 	prevPos = pos;
@@ -11,6 +11,7 @@ CParticle::CParticle(glm::vec3 _pos, float _mass, float _damping, CCube* _partMe
 	partMesh = _partMesh;
 	texture = _texture;
 	gameCamera = _gameCamera;
+	gameInput = _gameInput;
 
 	isFrozen = false;
 	force = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -52,6 +53,15 @@ void CParticle::Update(float _deltaTime)
 
 	// Create model matrix to combine them
 	objModelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+
+	// Mouse on the particle
+	if (gameInput->getClick(0) || gameInput->getClick(1))
+	{
+		if (gameInput->UpdateMousePicking(gameCamera, pos))
+		{
+			std::cout << "Mouse over particle" << std::endl;
+		}
+	}
 }
 
 void CParticle::Render()

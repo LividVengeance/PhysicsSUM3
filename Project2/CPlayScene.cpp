@@ -20,29 +20,44 @@ CPlayScene::CPlayScene(CCamera* _gameCamera, CInput* _gameInput, FMOD::System* _
 	const char* fileLocation = "Resources/Textures/BackgroundSprite.png";
 	TextureGen(fileLocation, &actorTex);
 
-	const char* cubeFileLocation = "Resources/Textures/frogChair.jpg";
-	TextureGen(cubeFileLocation, &actorCubeTex);
+	const char* cubeFileLocation = "Resources/Textures/dropSprite.png";
+	TextureGen(cubeFileLocation, &dropTex);
 
-	const char* waterFileLocation = "Resources/Textures/WaterSprite.png";
-	TextureGen(waterFileLocation, &actorWaterTex);
+	const char* waterFileLocation = "Resources/Textures/resetSprite.png";
+	TextureGen(waterFileLocation, &resetTex);
+
+	const char* increaseLocation = "Resources/Textures/increase.png";
+	TextureGen(increaseLocation, &increasePinTex);
+
+	const char* decreaseLocation = "Resources/Textures/decrease.png";
+	TextureGen(decreaseLocation, &decreasePinTex);
+
+	const char* applyLocation = "Resources/Textures/applySprite.png";
+	TextureGen(applyLocation, &applyWindTex);
+
+	const char* windRightLocation = "Resources/Textures/windRight.png";
+	TextureGen(windRightLocation, &windleftTex);
+
+	const char* windLeftLocation = "Resources/Textures/windLeft.png";
+	TextureGen(windLeftLocation, &windrightTex);
 
 	// Creates Mesh
 	actorPyramid = new CPyramid();
 	actorCube = new CCube(0.1f);
 
-	//partTest = new CParticle(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, -2.0f, actorCube, &programNoFog, &actorTex, gameCamera);
-
 	// Create Game Actors
 	actorCubeObj = new CObject(&programNoFog, actorCube->GetVAO(), actorCube->GetIndiceCount(), gameCamera, &actorTex);
-
-
-	clothSim = new CCloth(10.0f, 10.0f, 10.0f, 10.0f, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+	
+	// Cloth Sim
+	particleHeight = 10.0f;
+	clothSim = new CCloth(particleHeight, 10.0f, 10.0f, 10.0f, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
 
 	// Create Skybox
 	gameSkybox = new CSkybox(&programSkybox, gameCamera);
 
 	// Labels
-	restartLabel = new CTextLabel("Press 'R' to restart", "Resources/Fonts/arial.ttf", glm::vec2(10.0f, 570.0f), glm::vec3(0.0f, 1.0f, 0.5f), 0.5f);
+	//restartLabel = new CTextLabel("Press 'R' to restart", "Resources/Fonts/arial.ttf", glm::vec2(10.0f, 570.0f), glm::vec3(0.0f, 1.0f, 0.5f), 0.5f);
+	InitButtons();
 }
 
 CPlayScene::~CPlayScene()
@@ -52,6 +67,15 @@ CPlayScene::~CPlayScene()
 void CPlayScene::Render()
 {
 	glUseProgram(program);
+
+	// Buttons
+	dropObj->Render2D();
+	resetObj->Render2D();
+	increasePinObj->Render2D();
+	decreasePinObj->Render2D();
+	windLeftObj->Render2D();
+	windRightObj->Render2D();
+	applyWindObj->Render2D();
 
 	// Enabling Culling
 	glFrontFace(GL_CCW);
@@ -85,6 +109,8 @@ void CPlayScene::Update(GLfloat* deltaTime, ESceneManager* _currentScene)
 {
 	currentScene = _currentScene;
 	gameCamera->Update(*deltaTime);
+
+	ButtonChecks();
 
 	if (gameInput->getKeyState('d') || gameInput->getKeyState('D') || gameInput->getClick(0))
 	{
@@ -129,6 +155,28 @@ void CPlayScene::Update(GLfloat* deltaTime, ESceneManager* _currentScene)
 	}
 }
 
+bool CPlayScene::Button(float width, float height, CObject* _buttonObj)
+{
+	mouseX = gameInput->getMouseX();
+	mouseY = gameInput->getMouseY();
+
+	float offSetX = Utils::SCR_WIDTH / 2;
+	float offSetY = Utils::SCR_HEIGHT / 2;
+
+	if (-(offSetX - mouseX) > _buttonObj->objPosition.x - width / 2 &&
+		-(offSetX - mouseX) < _buttonObj->objPosition.x + width / 2 &&
+		offSetY - mouseY > _buttonObj->objPosition.y - height / 2 &&
+		offSetY - mouseY < _buttonObj->objPosition.y + height / 2 &&
+		(gameInput->GetFirstDown(0) || gameInput->GetFirstDown(1)))
+	{
+		return(true);
+	}
+	else
+	{
+		return(false);
+	}
+}
+
 void CPlayScene::TextureGen(const char* textureLocation, GLuint* texture)
 {
 	glGenTextures(1, texture);
@@ -150,4 +198,96 @@ void CPlayScene::TextureGen(const char* textureLocation, GLuint* texture)
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+void CPlayScene::ButtonChecks()
+{
+	// Mouse has clicked button check
+	dropObj->Update();
+	if (Button(150, 50, dropObj))
+	{
+		clothSim->allPartsInCloth[0]->isFrozen = false;
+		clothSim->allPartsInCloth[clothSim->allPartsInCloth.size() - clothSim->particleWidth]->isFrozen = false;
+	}
+
+	resetObj->Update();
+	if (Button(150, 50, resetObj))
+	{
+		delete clothSim;
+		clothSim = new CCloth(10.0f, 10.0f, 10.0f, 10.0f, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+	}
+
+	increasePinObj->Update();
+	if (Button(50, 50, increasePinObj))
+	{
+		particleHeight++;
+		delete clothSim;
+		clothSim = new CCloth(10.0f, 10.0f, 10.0f, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+	}
+
+	decreasePinObj->Update();
+	if (Button(50, 50, decreasePinObj) && particleHeight > 1)
+	{
+		particleHeight--;
+		delete clothSim;
+		clothSim = new CCloth(10.0f, 10.0f, 10.0f, particleHeight, 200.0f, 1.0f, glm::vec3(0.0f, 5.0f, 0.0f), gameCamera, gameInput);
+	}
+
+	windRightObj->Update();
+	if (Button(50, 50, windRightObj))
+	{
+		clothSim->wind = 1;
+	}
+
+	windLeftObj->Update();
+	if (Button(50, 50, windLeftObj))
+	{
+		clothSim->wind = 2;
+	}
+
+	applyWindObj->Update();
+	if (Button(150, 50, applyWindObj))
+	{
+		clothSim->apply = !clothSim->apply;
+	}
+}
+
+void CPlayScene::InitButtons()
+{
+	// Drop Cloth
+	dropPlane = new CPlane(150.0f, 50.0f);
+	dropObj = new CObject(&program, dropPlane->GetVAO(), dropPlane->GetIndiceCount(), gameCamera, &dropTex);
+	dropObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 120;
+	dropObj->objPosition.y -= 250;
+
+	// Reset Cloth
+	resetObj = new CObject(&program, dropPlane->GetVAO(), dropPlane->GetIndiceCount(), gameCamera, &resetTex);
+	resetObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 320;
+	resetObj->objPosition.y -= 250;
+
+	// Incerase Pins
+	increasePlane = new CPlane(50.0f, 50.0f);
+	increasePinObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &increasePinTex);
+	increasePinObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 170;
+	increasePinObj->objPosition.y -= 150;
+
+	// Decrease Pins
+	decreasePinObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &decreasePinTex);
+	decreasePinObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 70;
+	decreasePinObj->objPosition.y -= 150;
+
+	// Wind Right
+	windRightObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &windrightTex);
+	windRightObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 580;
+	windRightObj->objPosition.y -= 150;
+
+	// Wind Left
+	windLeftObj = new CObject(&program, increasePlane->GetVAO(), increasePlane->GetIndiceCount(), gameCamera, &windleftTex);
+	windLeftObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 470;
+	windLeftObj->objPosition.y -= 150;
+
+	// Appy Wind
+	applyWindObj = new CObject(&program, dropPlane->GetVAO(), dropPlane->GetIndiceCount(), gameCamera, &applyWindTex);
+	applyWindObj->objPosition.x -= (Utils::SCR_WIDTH / 2) - 520;
+	applyWindObj->objPosition.y -= 250;
 }

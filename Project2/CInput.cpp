@@ -60,6 +60,8 @@ void CInput::KeyboardUp(unsigned char key, int x, int y)
 void CInput::MousePassiveMove(int x, int y)
 {
 	//std::cout << "Passive x: " << x << " | y: " << y << std::endl;
+	mouseX = (2.0f * x) / (float)Utils::SCR_WIDTH - 1.0f;
+	mouseY = 1.0f - (2.0f * y) / (float)Utils::SCR_HEIGHT;
 }
 
 void CInput::MouseMove(int x, int y)
@@ -112,4 +114,40 @@ bool CInput::GetFirstDown(int button)
 	{
 		return(false);
 	}
+}
+
+bool CInput::UpdateMousePicking(CCamera* _camera, glm::vec3 _objPosition)
+{
+	// Screen pos
+	glm::vec2 normalizedScreenPos = glm::vec2(mouseX, mouseY);
+
+	// Screenpos to Proj Space
+	glm::vec4 clipCoords = glm::vec4(normalizedScreenPos.x, normalizedScreenPos.y, -1.0f, 1.0f);
+	
+	// Proj Space to eye space
+	glm::mat4 invProjMat = glm::inverse(_camera->CameraProjection());
+	glm::vec4 eyeCoords = invProjMat * clipCoords;
+	eyeCoords = glm::vec4(eyeCoords.x, eyeCoords.y, -1.0f, 0.0f);
+
+	// Eyespace to world space
+	glm::mat4 invViewMat = glm::inverse(_camera->CameraView());
+	glm::vec4 rayWorld = invViewMat * eyeCoords;
+	rayDirection = glm::normalize(glm::vec3(rayWorld));
+
+	// Intersection with object
+	float radius = 2.0f;
+	glm::vec3 v = _objPosition - _camera->GetCamPos();
+
+	float a = glm::dot(rayDirection, rayDirection);
+	float b = 2 * glm::dot(v, rayDirection);
+	float c = glm::dot(v, v) - radius * radius;
+	float d = b * b - 4 * a * c;
+
+	float x1 = (-b - sqrt(d)) / 2;
+	float x2 = (-b + sqrt(d)) / 2;
+	if ((d > 0) && (x1 >= 0 && x2 >= 0) || (x1 < 0 && x2 >= 0))
+	{
+		return(true);
+	}
+	return(false);
 }
